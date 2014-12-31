@@ -2,16 +2,16 @@
 
 int getStringLength(char *str)
 {
-    int resultLength = 0;
+    int result= 0;
 
-    // loop until you find the null ending term
-    for(int i = 0; str[i]; i++)
+    for(int index = 0; str[index]; index++)
     {
-        ++resultLength;
+        ++result;
     }
-    return resultLength;
+    return result;
 }
 
+// Utliity function NOTE: Not currently used
 void clearTempStringsToNull(char *str)
 {
     int length = getStringLength(str);
@@ -22,6 +22,7 @@ void clearTempStringsToNull(char *str)
 }
 
 //TODO: make another compreString that is case insensitive
+//TODO: Mabye look at returning a value rather then hard 0 or 1
 int compareString(char *fString, char *sString) // first/second String
 {
     int firstStringLength = getStringLength(fString);
@@ -30,12 +31,9 @@ int compareString(char *fString, char *sString) // first/second String
     {
         return 0;
     }
-
     for(int index = 0; index <= firstStringLength; index++)
     {
-        if(fString[index] == sString[index])
-        { }
-        else
+        if(fString[index] != sString[index])
         { return 0; }
     }
     return 1;
@@ -45,24 +43,10 @@ int compareString(char *fString, char *sString) // first/second String
 char* CopyString(char *strToCopy)
 {
     char *result = (char*)calloc(getStringLength(strToCopy)+1, sizeof(char));
-    //clearTempStringsToNull(result);
 
-    for (int i = 0; strToCopy[i]; i++)
+    for (int index = 0; strToCopy[index]; index++)
     {
-        result[i] = strToCopy[i];
-    }
-    return result;
-}
-// if the end user knows the length they can pass it instead of my getting it
-
-char* CopyString(char *strToCopy, int lengthOfStrToCopy)
-{
-    char *result = (char*)calloc(lengthOfStrToCopy+1,sizeof(char));
-    //clearTempStringsToNull(result);
-
-    for (int i = 0; strToCopy[i]; i++)
-    {
-        result[i] = strToCopy[i];
+        result[index] = strToCopy[index];
     }
     return result;
 }
@@ -70,9 +54,9 @@ char* CopyString(char *strToCopy, int lengthOfStrToCopy)
 //NOTE(Dustin): Overloaded function, the calle defines were the copy gets placed
 void CopyString(char *strToCopy, char *placeToPutCopiedString)
 {
-    for (int i = 0; strToCopy[i]; i++)
+    for (int index = 0; strToCopy[index]; index++)
     {
-        placeToPutCopiedString[i] = strToCopy[i];
+        placeToPutCopiedString[index] = strToCopy[index];
     }
 }
 
@@ -84,25 +68,24 @@ char* CatString(char *originString, char *strToCat)
     int outstringLength = (originLength + catStrLength);
     int catStrIndex = 0;
 
-    char *resultString = ((char*)calloc(outstringLength+1, sizeof(char)));
-    //clearTempStringsToNull(resultString);
+    char *result = ((char*)calloc(outstringLength+1, sizeof(char)));
 
     for(int index = 0; index < outstringLength; index++)
     {
         if(index < originLength)
         {
-            resultString[index] = originString[index];
+            result[index] = originString[index];
         }
         else
         {
-                resultString[index] = strToCat[catStrIndex];
-                catStrIndex++;
+            result[index] = strToCat[catStrIndex];
+            catStrIndex++;
         }
     }
-    return resultString;
+    return result;
 }
 
-//Lets the enduser mangage the memory for the outputstring
+//Overloaded function to let calle tell where to put the result
 void CatString(char *originString, char *strToCat, char *outputString)
 {
     int originLength = getStringLength(originString);
@@ -118,47 +101,16 @@ void CatString(char *originString, char *strToCat, char *outputString)
         }
         else
         {
-            if (index < catStrLength)
-            {
-                outputString[index] =strToCat[catStrIndex];
-                catStrLength++;
-            }
-            else
-            {
-                // How did you get here
-            }
-        }
-    }
-}
-
-//Lets the enduser pass in the lengths if he has them from something prior
-char* CatString(char *originString, int originLength, char *strToCat, int catStrLength)
-{
-    int catStrIndex = 0;
-    char *resultString = ((char*)calloc((originLength + catStrLength) + 1, sizeof(char)));
-    //clearTempStringsToNull(resultString);
-
-    for(int index = 0; index <= (originLength + catStrLength); index++)
-    {
-        if(index <= originLength)
-        {
-            resultString[index] = originString[index];
-        }
-        if (index <= catStrLength)
-        {
-            resultString[index] = strToCat[catStrIndex];
+            outputString[index] =strToCat[catStrIndex];
             catStrLength++;
         }
     }
-    return resultString;
 }
 
-//TODO: create a overload of this that lets user mangage all the mermory allocs
+//IF successful, calle has to free the result
 char* SplitString(char *inputString, char strDelim, char *savePlace)
 {
-    //char *resultToken = ((char*)malloc(getStringLength(inputString)+1));
     char *tempParsingString = ((char*)calloc(getStringLength(inputString)+1, sizeof(char)));
-    //clearTempStringsToNull(tempParsingString);
     bool isParsingStringToDelim = true;
     int index = 0;
     int resultIndex = 0;
@@ -181,9 +133,9 @@ char* SplitString(char *inputString, char strDelim, char *savePlace)
             isParsingStringToDelim = false;
             index++;
 
-            for(int i = 0; tempParsingString[(index)]; i++)
+            for(int localIndex = 0; tempParsingString[(index)]; localIndex++)
             {
-                savePlace[i] = tempParsingString[index];
+                savePlace[localIndex] = tempParsingString[index];
                 index++;
             }
         }
@@ -196,17 +148,15 @@ char* SplitString(char *inputString, char strDelim, char *savePlace)
 
     if(resultIndex)
     {
-        char *resultToken = ((char*)calloc(resultIndex+1, sizeof(char)));
-        //clearTempStringsToNull(resultToken);
+        char *result = ((char*)calloc(resultIndex+1, sizeof(char)));
 
-        for(int i = 0; i < resultIndex; i++)
+        for(int localIndex = 0; localIndex < resultIndex; localIndex++)
         {
-            //resultToken is a pointer on the heap
-            resultToken[i] = tempParsingString[i];
+            result[localIndex] = tempParsingString[localIndex];
         }
 
         free(tempParsingString);
-        return resultToken;
+        return result;
     }
     else
     {
@@ -215,16 +165,15 @@ char* SplitString(char *inputString, char strDelim, char *savePlace)
     }
 }
 
+//Overloaded function allows calle to tell us were to put the result
 void SplitString(char *inputString, char *outputString ,char strDelim, char *savePlace)
 {
-    //char *resultToken = ((char*)calloc(getStringLength(inputString)+1));
     char *tempParsingString = ((char*)calloc(getStringLength(inputString)+1, sizeof(char)));
-    //clearTempStringsToNull(tempParsingString);
     bool isParsingStringToDelim = true;
     int index = 0;
     int resultIndex = 0;
 
-    if(inputString) // see if null so we know to use the savePlace as the start
+    if(inputString)
     {
         CopyString(inputString, tempParsingString);
     }
@@ -241,9 +190,9 @@ void SplitString(char *inputString, char *outputString ,char strDelim, char *sav
             isParsingStringToDelim = false;
             index++;
 
-            for(int i = 0; tempParsingString[(index)]; i++)
+            for(int localIndex = 0; tempParsingString[(index)]; localIndex++)
             {
-                savePlace[i] = tempParsingString[index];
+                savePlace[localIndex] = tempParsingString[index];
                 index++;
             }
         }
@@ -257,9 +206,9 @@ void SplitString(char *inputString, char *outputString ,char strDelim, char *sav
     if(resultIndex)
     {
 
-        for(int i = 0; i < resultIndex; i++)
+        for(int localIndex = 0; localIndex < resultIndex; localIndex++)
         {
-            outputString[i] = tempParsingString[i];
+            outputString[localIndex] = tempParsingString[localIndex];
         }
 
         free(tempParsingString);

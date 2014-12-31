@@ -25,44 +25,41 @@ SplitLineToAppPathPair(char *str, char delim = '=')
 {
     AppPathPair curProccessingApp = {};
 
-    //just a place to save the rest of the line after the delim
-    char *saveptr = ((char*)calloc(getStringLength(str)+1, sizeof(char)));
+    char *path= ((char*)calloc(getStringLength(str)+1, sizeof(char)));
 
     char *tempStr = str;
-    char *token = SplitString(tempStr, delim, saveptr);
+    char *token = SplitString(tempStr, delim, path);
 
     //TODO: Make this less janky
     // This also assumes there is only 2 parts a application name and a
     // application path
     if(token)
     {
-        printf("\nDEBUG | Application -> %s\n", token);
+        //printf("\nDEBUG | Application -> %s\n", token);
+        //printf("\nDEBUG | Path -> %s\n", path);
+
         curProccessingApp.application = CopyString(token);
-        
-        // temp until splitString is fixed to take null
-        printf("\nDEBUG | Path -> %s\n", saveptr);
-        curProccessingApp.path = CopyString(saveptr);
+        curProccessingApp.path = CopyString(path);
     }
     else
     {
         printf_s("\nInvalid Token: %s\n", token);
     }
+
     free(token);
-    free(saveptr);
+    free(path);
+
     return curProccessingApp;
 }
 
 internal int
 CLConfigParser(char *configFile)
 {
-    // following if the current line in the config.cfg that I am trying to read
-    // openTTD="C:\Program Files (x86)\OpenTTD\openttd.exe"
-    // though when I debug the currentLine is only openTTD=\
-
-    FILE *cfg = fopen(configFile, "r"); // open the config file read-only
+    FILE *cfg = fopen(configFile, "r");
 
     if (cfg)
     {
+        //TODO: Look at doing this dynamicly so we don't possible run over
         char currentLine[256] = {};
         int validLineCount = 0;
 
@@ -88,23 +85,23 @@ CLArgsParser(char *arg, int validAppCount)
 {
     if(compareString(arg,"-h") || compareString(arg,"--help") || compareString(arg,"/?"))
     {
-        printf("\n%s\n", arg);
-        printf("THIS IS HELP\n");
-        //TODO: Actually print some help for the end user
+        printf("Thanks for using CMDLAUNCHER: to use this application you need to ensure");
+        printf(" that you have a config.cfg file in the same location as the .exe this");
+        printf(" file should be in the format of <nameToCallFromCMDLine>=<PathToExecutable>");
+        printf("\nLaunch from the command line like launch <name> so 'launch vlc' could be");
+        printf(" valid if there was a vlc=<somePath> in your config file");
     }
     else
     {
-        for(int i = 0; i < validAppCount; i++)
+        for(int index = 0; index < validAppCount; index++)
         {
-            if(compareString(arg, ParsingApps[i].application))
+            if(compareString(arg, ParsingApps[index].application))
             {
                 //printf("\nPATH -> %s\n", ParsingApps[i].path);
 
-                // String work to get everything in 1 string so system() can work
-
-                char *buffer = CatString("call ", ParsingApps[i].path);
-                printf("output: %s\n",buffer);
-                system(buffer);
+                char *buffer = CatString("call ", ParsingApps[index].path);
+                //printf("output: %s\n",buffer);
+                system(buffer); //TODO: See what else we can use here
             }
         }
     }
@@ -112,7 +109,7 @@ CLArgsParser(char *arg, int validAppCount)
 
 int main(int argc, char *argv[])
 {
-    if (argc  >= 1)
+    if (argc  > 1)
     {
         int validApplicationCount = CLConfigParser("config.cfg");
         if(validApplicationCount > 0)
