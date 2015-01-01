@@ -21,21 +21,24 @@ void clearTempStringsToNull(char *str)
 }
 
 //TODO: make another compreString that is case insensitive
-//TODO: Mabye look at returning a value rather then hard 0 or 1
-int compareString(char *fString, char *sString) // first/second String
+bool compareString(char *fString, char *sString) // first/second String
 {
-    int firstStringLength = getStringLength(fString);
+    int index = 0;
+    bool result = false;
 
-    if(firstStringLength != getStringLength(sString))
-    {
-        return 0;
-    }
-    for(int index = 0; index <= firstStringLength; index++)
+    while(fString[index])
     {
         if(fString[index] != sString[index])
-        { return 0; }
+        { break;}
+
+        index++;
     }
-    return 1;
+    if (!sString[index])
+    {
+        result = true;
+    }
+
+    return result;
 }
 
 //NOTE(Dustin): You will have to free this memory if you use this function
@@ -106,14 +109,14 @@ void CatString(char *originString, char *strToCat, char *outputString)
     }
 }
 
-// if no outputstring then calle has to free
+// if no outputstring then calle has to free | if you don't give me a valid savePlace you get nothing back about where you were in the string/array
 char* SplitString(char *inputString, char strDelim, char *savePlace, char *outputString=NULL)
 {
     bool isParsingStringToDelim = true;
     int index = 0;
     int resultIndex = 0;
 
-    if(inputString) // see if null so we know to use the savePlace as the start
+    if(inputString)
     {
         while (isParsingStringToDelim)
         {
@@ -124,10 +127,13 @@ char* SplitString(char *inputString, char strDelim, char *savePlace, char *outpu
                 isParsingStringToDelim = false;
                 index++;
 
-                for(int localIndex = 0; inputString[index]; localIndex++)
+                if (savePlace)
                 {
-                    savePlace[localIndex] = inputString[index];
-                    index++;
+                    for(int localIndex = 0; inputString[index]; localIndex++)
+                    {
+                        savePlace[localIndex] = inputString[index];
+                        index++;
+                    }
                 }
             }
             else
@@ -163,7 +169,7 @@ char* SplitString(char *inputString, char strDelim, char *savePlace, char *outpu
                 {
                     outputString[localIndex] = inputString[localIndex];
                 }
-                return ""; // make sure if this is in a if that it doesnt fail all the time
+                return outputString; // make sure if this is in a if that it doesnt fail all the time
             }
         }
     }
