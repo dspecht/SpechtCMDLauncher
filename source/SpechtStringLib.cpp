@@ -11,13 +11,12 @@ int getStringLength(char *str)
     return result;
 }
 
-// Utliity function NOTE: Not currently used
+// Utliity function
 void clearTempStringsToNull(char *str)
 {
-    int length = getStringLength(str);
-    for(int i = 0; i < length; i++)
+    for(int index = 0; str[index] ; index++)
     {
-        str[i] = 0;
+        str[index] = 0;
     }
 }
 
@@ -107,114 +106,67 @@ void CatString(char *originString, char *strToCat, char *outputString)
     }
 }
 
-//IF successful, calle has to free the result
-char* SplitString(char *inputString, char strDelim, char *savePlace)
+// if no outputstring then calle has to free
+char* SplitString(char *inputString, char strDelim, char *savePlace, char *outputString=NULL)
 {
-    char *tempParsingString = ((char*)calloc(getStringLength(inputString)+1, sizeof(char)));
     bool isParsingStringToDelim = true;
     int index = 0;
     int resultIndex = 0;
 
     if(inputString) // see if null so we know to use the savePlace as the start
     {
-        CopyString(inputString, tempParsingString);
-        clearTempStringsToNull(savePlace);
-    }
-    else
-    {
-        CopyString(savePlace, tempParsingString);
-    }
-
-    while (isParsingStringToDelim)
-    {
-        //TODO: make this take multiple possible delim characters
-        if(tempParsingString[index] == strDelim)
+        while (isParsingStringToDelim)
         {
-            isParsingStringToDelim = false;
-            index++;
-
-            for(int localIndex = 0; tempParsingString[(index)]; localIndex++)
+            //TODO: make this take multiple possible delim characters
+            if(inputString[index] == strDelim)
             {
-                savePlace[localIndex] = tempParsingString[index];
+                clearTempStringsToNull(savePlace);
+                isParsingStringToDelim = false;
                 index++;
+
+                for(int localIndex = 0; inputString[index]; localIndex++)
+                {
+                    savePlace[localIndex] = inputString[index];
+                    index++;
+                }
+            }
+            else
+            {
+                if (inputString[index])
+                {
+                    resultIndex++;
+                    index++;
+                }
+                else
+                {
+                    break;
+                }
             }
         }
-        else if(tempParsingString[index])
+
+        if(resultIndex)
         {
-            resultIndex++;
-            index++;
-        }
-    }
-
-    if(resultIndex)
-    {
-        char *result = ((char*)calloc(resultIndex+1, sizeof(char)));
-
-        for(int localIndex = 0; localIndex < resultIndex; localIndex++)
-        {
-            result[localIndex] = tempParsingString[localIndex];
-        }
-
-        free(tempParsingString);
-        return result;
-    }
-    else
-    {
-        free(tempParsingString);
-        return NULL;
-    }
-}
-
-//Overloaded function allows calle to tell us were to put the result
-void SplitString(char *inputString, char *outputString ,char strDelim, char *savePlace)
-{
-    char *tempParsingString = ((char*)calloc(getStringLength(inputString)+1, sizeof(char)));
-    bool isParsingStringToDelim = true;
-    int index = 0;
-    int resultIndex = 0;
-
-    if(inputString)
-    {
-        CopyString(inputString, tempParsingString);
-    }
-    else
-    {
-        CopyString(savePlace, tempParsingString);
-    }
-
-    while (isParsingStringToDelim)
-    {
-        //TODO: make this take multiple possible delim characters
-        if(tempParsingString[index] == strDelim)
-        {
-            isParsingStringToDelim = false;
-            index++;
-
-            for(int localIndex = 0; tempParsingString[(index)]; localIndex++)
+            if(!outputString)
             {
-                savePlace[localIndex] = tempParsingString[index];
-                index++;
+                char *result = ((char*)calloc(resultIndex+1, sizeof(char)));
+
+                for(int localIndex = 0; localIndex < resultIndex; localIndex++)
+                {
+                    result[localIndex] = inputString[localIndex];
+                }
+
+                return result;
+            }
+            else
+            {
+                for(int localIndex = 0; localIndex < resultIndex; localIndex++)
+                {
+                    outputString[localIndex] = inputString[localIndex];
+                }
+                return ""; // make sure if this is in a if that it doesnt fail all the time
             }
         }
-        else if(tempParsingString[index])
-        {
-            resultIndex++;
-            index++;
-        }
     }
 
-    if(resultIndex)
-    {
-
-        for(int localIndex = 0; localIndex < resultIndex; localIndex++)
-        {
-            outputString[localIndex] = tempParsingString[localIndex];
-        }
-
-        free(tempParsingString);
-    }
-    else
-    {
-        free(tempParsingString);
-    }
+    return NULL;
 }

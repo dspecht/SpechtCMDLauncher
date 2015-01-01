@@ -1,6 +1,5 @@
 // Launch.cpp is a command line utilitiy for launching Applications without
 // a .bat script from a config file
-// TODO: Write my own token parsing, and compare
 
 #include <cstdio>
 #include <stdlib.h>
@@ -27,16 +26,15 @@ SplitLineToAppPathPair(char *str, char delim = '=')
 
     char *path= ((char*)calloc(getStringLength(str)+1, sizeof(char)));
 
-    char *tempStr = str;
-    char *token = SplitString(tempStr, delim, path);
+    char *token = SplitString(str, delim, path);
 
     //TODO: Make this less janky
     // This also assumes there is only 2 parts a application name and a
     // application path
     if(token)
     {
-        //printf("\nDEBUG | Application -> %s\n", token);
-        //printf("\nDEBUG | Path -> %s\n", path);
+        //printf_s("\nDEBUG | Application -> %s\n", token);
+        //printf_s("\nDEBUG | Path -> %s\n", path);
 
         curProccessingApp.application = CopyString(token);
         curProccessingApp.path = CopyString(path);
@@ -85,11 +83,12 @@ CLArgsParser(char *arg, int validAppCount)
 {
     if(compareString(arg,"-h") || compareString(arg,"--help") || compareString(arg,"/?"))
     {
-        printf("Thanks for using CMDLAUNCHER: to use this application you need to ensure");
-        printf(" that you have a config.cfg file in the same location as the .exe this");
-        printf(" file should be in the format of <nameToCallFromCMDLine>=<PathToExecutable>");
-        printf("\nLaunch from the command line like launch <name> so 'launch vlc' could be");
-        printf(" valid if there was a vlc=<somePath> in your config file");
+        //TODO: maybe look at shortening the help into fewer printf's
+        printf_s("Thanks for using CMDLAUNCHER: to use this application you need to ensure");
+        printf_s(" that you have a config.cfg file in the same location as the .exe this");
+        printf_s(" file should be in the format of <nameToCallFromCMDLine>=<PathToExecutable>");
+        printf_s("\nLaunch from the command line like launch <name> so 'launch vlc' could be");
+        printf_s(" valid if there was a vlc=<somePath> in your config file");
     }
     else
     {
@@ -97,10 +96,10 @@ CLArgsParser(char *arg, int validAppCount)
         {
             if(compareString(arg, ParsingApps[index].application))
             {
-                //printf("\nPATH -> %s\n", ParsingApps[i].path);
+                //printf_s("\nPATH -> %s\n", ParsingApps[i].path);
 
                 char *buffer = CatString("call ", ParsingApps[index].path);
-                //printf("output: %s\n",buffer);
+                //printf_s("output: %s\n",buffer);
                 system(buffer); //TODO: See what else we can use here
             }
         }
@@ -120,7 +119,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-        printf("\ninvalid argument count: must have 1 arg\n");
+        printf_s("\ninvalid argument count: must have 1 arg\n");
     }
 
     return 0;
