@@ -36,76 +36,75 @@ bool compareString(char *fString, char *sString) // first/second String
     if (!sString[index])
     {
         result = true;
-    }
 
-    return result;
-}
-
-//NOTE(Dustin): You will have to free this memory if you use this function
-char* CopyString(char *strToCopy)
-{
-    char *result = (char*)calloc(getStringLength(strToCopy)+1, sizeof(char));
-
-    for (int index = 0; strToCopy[index]; index++)
-    {
-        result[index] = strToCopy[index];
     }
     return result;
 }
 
-//NOTE(Dustin): Overloaded function, the calle defines were the copy gets placed
-void CopyString(char *strToCopy, char *placeToPutCopiedString)
+//NOTE(dustin): if you don't pass a placetoputcopiedstring then you will have to free the result
+char* CopyString(char *strToCopy, char *placeToPutCopiedString=NULL)
 {
-    for (int index = 0; strToCopy[index]; index++)
+    if(!placeToPutCopiedString)
     {
-        placeToPutCopiedString[index] = strToCopy[index];
+        char *result = (char*)calloc(getStringLength(strToCopy)+1, sizeof(char));
+
+        for (int index = 0; strToCopy[index]; index++)
+        {
+            result[index] = strToCopy[index];
+        }
+        return result;
+    }
+    else
+    {
+        for (int index = 0; strToCopy[index]; index++)
+        {
+            placeToPutCopiedString[index] = strToCopy[index];
+        }
+        return placeToPutCopiedString; // if you check for a return, this make it not fail everytime
     }
 }
 
 //NOTE(Dustin): Enduser needs to free the resultstring
-char* CatString(char *originString, char *strToCat)
+char* CatString(char *originString, char *strToCat, char *outputString=NULL)
 {
     int originLength = getStringLength(originString);
     int catStrLength = getStringLength(strToCat);
     int outstringLength = (originLength + catStrLength);
     int catStrIndex = 0;
 
-    char *result = ((char*)calloc(outstringLength+1, sizeof(char)));
-
-    for(int index = 0; index < outstringLength; index++)
+    if(!outputString)
     {
-        if(index < originLength)
+        char *result = ((char*)calloc(outstringLength+1, sizeof(char)));
+
+        for(int index = 0; index < outstringLength; index++)
         {
-            result[index] = originString[index];
+            if(index < originLength)
+            {
+                result[index] = originString[index];
+            }
+            else
+            {
+                result[index] = strToCat[catStrIndex];
+                catStrIndex++;
+            }
         }
-        else
-        {
-            result[index] = strToCat[catStrIndex];
-            catStrIndex++;
-        }
+        return result;
     }
-    return result;
-}
-
-//Overloaded function to let calle tell where to put the result
-void CatString(char *originString, char *strToCat, char *outputString)
-{
-    int originLength = getStringLength(originString);
-    int catStrLength = getStringLength(strToCat);
-    int outstringLength = (originLength + catStrLength);
-    int catStrIndex = 0;
-
-    for(int index = 0; index < outstringLength; index++)
+    else
     {
-        if(index < originLength)
+        for(int index = 0; index < outstringLength; index++)
         {
-            outputString[index] = originString[index];
+            if(index < originLength)
+            {
+                outputString[index] = originString[index];
+            }
+            else
+            {
+                outputString[index] =strToCat[catStrIndex];
+                catStrLength++;
+            }
         }
-        else
-        {
-            outputString[index] =strToCat[catStrIndex];
-            catStrLength++;
-        }
+        return outputString; // if you check for a return, this  makes it not just fail
     }
 }
 
