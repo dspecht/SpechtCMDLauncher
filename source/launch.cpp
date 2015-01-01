@@ -3,7 +3,7 @@
 
 #include <cstdio>
 #include <stdlib.h>
-#include "SpechtStringLib.cpp"
+#include "cStingLib.h"
 
 #define internal static
 #define local_persist static
@@ -25,14 +25,11 @@ SplitLineToAppPathPair(char *str, char delim = '=')
     AppPathPair curProccessingApp = {};
 
     char *path= ((char*)calloc(getStringLength(str)+1, sizeof(char)));
-
     char *token = SplitString(str, delim, path);
 
-    //TODO: Make this less janky
-    // This also assumes there is only 2 parts a application name and a
-    // application path
     if(token)
     {
+        //DEBUG PRINTS
         //printf_s("\nDEBUG | Application -> %s\n", token);
         //printf_s("\nDEBUG | Path -> %s\n", path);
 
@@ -110,6 +107,7 @@ int main(int argc, char *argv[])
 {
     if (argc  > 1)
     {
+        // this assumes the config.cfg is in the same directory as the exe. may look at changing this to relative  or soemthing?
         int validApplicationCount = CLConfigParser("config.cfg");
         if(validApplicationCount > 0)
         {
