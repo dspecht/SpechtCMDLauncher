@@ -3,7 +3,7 @@
 
 #include <cstdio>
 #include <stdlib.h>
-#include "cStingLib.h"
+#include "cStringLib.h"
 
 #define internal static
 #define local_persist static
