@@ -80,12 +80,9 @@ CLArgsParser(char *arg, int validAppCount)
 {
     if(compareString(arg,"-h") || compareString(arg,"--help") || compareString(arg,"/?"))
     {
-        //TODO: maybe look at shortening the help into fewer printf's
-        printf_s("Thanks for using CMDLAUNCHER: to use this application you need to ensure");
-        printf_s(" that you have a config.cfg file in the same location as the .exe this");
-        printf_s(" file should be in the format of <nameToCallFromCMDLine>=<PathToExecutable>");
-        printf_s("\nLaunch from the command line like launch <name> so 'launch vlc' could be");
-        printf_s(" valid if there was a vlc=<somePath> in your config file");
+        printf_s("\nUSAGE: launch [--help] [-h] [/?] <alais to launch>");
+        printf_s("\nPlease make sure the alais is in the config, it won't work if it is not");
+        printf_s("\nConfig file should be formated such as | alias=\"<path to some executable>\"");
     }
     else
     {
@@ -93,10 +90,8 @@ CLArgsParser(char *arg, int validAppCount)
         {
             if(compareString(arg, ParsingApps[index].application))
             {
-                //printf_s("\nPATH -> %s\n", ParsingApps[i].path);
-
-                char *buffer = CatString("call ", ParsingApps[index].path);
-                //printf_s("output: %s\n",buffer);
+                //DEBUG printf_s("\nPATH -> %s\n", ParsingApps[i].path);
+                char *buffer = CatString("start \"\" ", ParsingApps[index].path);
                 system(buffer); //TODO: See what else we can use here
             }
         }
@@ -108,11 +103,16 @@ int main(int argc, char *argv[])
     if (argc  > 1)
     {
         // this assumes the config.cfg is in the same directory as the exe. may look at changing this to relative  or soemthing?
-        int validApplicationCount = CLConfigParser("config.cfg");
+        int validApplicationCount = CLConfigParser("./config.cfg");
         if(validApplicationCount > 0)
         {
             char *cmdArg = argv[1];
             CLArgsParser(cmdArg, validApplicationCount);
+        }
+        else
+        {
+            printf_s("\nConfig File Error, Either file is empty or formated wrong | use launch -h to get help on using this cli program");
+
         }
     }
     else
