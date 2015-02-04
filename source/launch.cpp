@@ -47,54 +47,38 @@ SplitLineToAppPathPair(char *str, char delim = '=')
     return curProccessingApp;
 }
 
-internal int
-CLConfigParser(char *configFile)
-{
-    FILE *cfg = fopen(configFile, "r");
-
-    if (cfg)
-    {
-        //TODO: Look at doing this dynamicly so we don't possible run over
-        char currentLine[256] = {};
-        int validLineCount = 0;
-
-        while(fgets(currentLine, 256, cfg))
-        {
-            ParsingApps[validLineCount] = SplitLineToAppPathPair((char *)&currentLine);
-            validLineCount++;
-        }
-
-        fclose(cfg);
-        return validLineCount;
-    }
-    else
-    {
-        printf_s("\nThe config file was not found, please check the name : %s", configFile);
-        fclose(cfg);
-        return 0;
-    }
-}
-
 internal void
-CLArgsParser(char *arg, int validAppCount)
+SearchAndRun(char *arg, char *fileName)
 {
-    if(compareString(arg,"-h") || compareString(arg,"--help") || compareString(arg,"/?"))
+    FILE *configFile;
+    fopen_s(&configFile, fileName, "r");
+    char currentLine[256] = {};
+    bool isFinished = false;
+
+    AppPathPair app = {};
+
+    while(fgets(currentLine, 265, configFile))
     {
-        printf_s("\nUSAGE: launch [--help] [-h] [/?] <alais to launch>");
-        printf_s("\nPlease make sure the alais is in the config, it won't work if it is not");
-        printf_s("\nConfig file should be formated such as | alias=\"<path to some executable>\"");
-    }
-    else
-    {
-        for(int index = 0; index < validAppCount; index++)
+        app = SplitLineToAppPathPair((char *)&currentLine);
+
+        if(compareString(app.application, arg))
         {
-            if(compareString(arg, ParsingApps[index].application))
-            {
-                //DEBUG printf_s("\nPATH -> %s\n", ParsingApps[i].path);
-                char *buffer = CatString("start \"\" ", ParsingApps[index].path);
-                system(buffer); //TODO: See what else we can use here
-            }
+            fclose(configFile);
+
+            isFinished = true;
+
+            char *buffer = CatString("start \"\" ", app.path);
+            system(buffer);
         }
+        else
+        {
+            app = {};
+        }
+    }
+    if(!isFinished)
+    {
+       fclose(configFile);
+       printf_s("Unable to find %s as a valid command", arg);
     }
 }
 
@@ -102,18 +86,7 @@ int main(int argc, char *argv[])
 {
     if (argc  > 1)
     {
-        // this assumes the config.cfg is in the same directory as the exe. may look at changing this to relative  or soemthing?
-        int validApplicationCount = CLConfigParser("./config.cfg");
-        if(validApplicationCount > 0)
-        {
-            char *cmdArg = argv[1];
-            CLArgsParser(cmdArg, validApplicationCount);
-        }
-        else
-        {
-            printf_s("\nConfig File Error, Either file is empty or formated wrong | use launch -h to get help on using this cli program");
-
-        }
+        SearchAndRun(argv[1], "./config.cfg");
     }
     else
     {

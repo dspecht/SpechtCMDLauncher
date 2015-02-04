@@ -21,7 +21,7 @@ void clearTempStringsToNull(char *str)
 }
 
 //TODO: make another compreString that is case insensitive
-bool compareString(char *fString, char *sString) // first/second String
+bool compareString(char *fString, char *sString)
 {
     int index = 0;
     bool result = false;
@@ -29,19 +29,18 @@ bool compareString(char *fString, char *sString) // first/second String
     while(fString[index])
     {
         if(fString[index] != sString[index])
-        { break;}
+        {break;}
 
         index++;
     }
     if (!sString[index])
     {
         result = true;
-
     }
     return result;
 }
 
-//NOTE(dustin): if you don't pass a placetoputcopiedstring then you will have to free the result
+//NOTE(dustin): if you don't pass a placeToPutCopiedString then you will have to free the result
 char* CopyString(char *strToCopy, char *placeToPutCopiedString=NULL)
 {
     if(!placeToPutCopiedString)
@@ -64,7 +63,6 @@ char* CopyString(char *strToCopy, char *placeToPutCopiedString=NULL)
     }
 }
 
-//NOTE(Dustin): Enduser needs to free the resultstring
 char* CatString(char *originString, char *strToCat, char *outputString=NULL)
 {
     int originLength = getStringLength(originString);
@@ -109,6 +107,7 @@ char* CatString(char *originString, char *strToCat, char *outputString=NULL)
 }
 
 // if no outputstring then calle has to free | if you don't give me a valid savePlace you get nothing back about where you were in the string/array
+
 char* SplitString(char *inputString, char strDelim, char *savePlace, char *outputString=NULL)
 {
     bool isParsingStringToDelim = true;
