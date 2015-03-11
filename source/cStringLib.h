@@ -1,4 +1,6 @@
-// This file is for a basic string library so I do not have to use <cstring>
+#ifndef CSTRINGLIB_H
+#define CSTRINGLIB_H
+#include <stdlib.h>
 
 int getStringLength(char *str)
 {
@@ -174,3 +176,4 @@ char* SplitString(char *inputString, char strDelim, char *savePlace, char *outpu
 
     return NULL;
 }
+#endif

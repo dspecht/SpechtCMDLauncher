@@ -9,15 +9,13 @@
 #define local_persist static
 #define global_variable static
 
+global_variable int numberOfCLArgs = 0;
+
 struct AppPathPair
 {
     char *application;
     char *path;
 };
-
-// TODO: Dynamicly store these so we don't have a hard limit and so we don't
-// have to many
-global_variable AppPathPair ParsingApps[100] = {};
 
 internal AppPathPair
 SplitLineToAppPathPair(char *str, char delim = '=')
@@ -48,37 +46,61 @@ SplitLineToAppPathPair(char *str, char delim = '=')
 }
 
 internal void
-SearchAndRun(char *arg, char *fileName)
+SearchAndRun(char *arg[], char *fileName)
 {
     FILE *configFile;
-    fopen_s(&configFile, fileName, "r");
-    char currentLine[256] = {};
+    char currentLine[512] = {};
     bool isFinished = false;
-
     AppPathPair app = {};
 
-    while(fgets(currentLine, 265, configFile))
+    if(!fopen_s(&configFile, fileName, "r"))
     {
-        app = SplitLineToAppPathPair((char *)&currentLine);
-
-        if(compareString(app.application, arg))
+        while(fgets(currentLine, 512, configFile))
         {
-            fclose(configFile);
+            app = SplitLineToAppPathPair((char *)&currentLine);
 
-            isFinished = true;
+            if(compareString(app.application, arg[1]))
+            {
+                fclose(configFile);
 
-            char *buffer = CatString("start \"\" ", app.path);
-            system(buffer);
+                isFinished = true;
+
+                //NOTE(dustin) if you use buffer please free it
+                //char *buffer = CatString("start \"\" ", app.path);
+
+                if(numberOfCLArgs > 2)
+                {
+                    int extraArgs = numberOfCLArgs - 2;
+                    char *buffer = CatString(app.path, " ");
+
+                    for(int i = 0; i <= extraArgs; i++)
+                    {
+                        buffer = CatString(buffer, arg[i+2]);
+                        buffer = CatString(buffer, " ");
+                    }
+                    system(buffer);
+                    free(buffer);
+                }
+                else
+                {
+                    system(app.path);
+                }
+                break;
+            }
+            else
+            {
+                app = {};
+            }
         }
-        else
+        if(!isFinished)
         {
-            app = {};
+           fclose(configFile);
+           printf_s("Unable to find %s as a valid command", arg);
         }
     }
-    if(!isFinished)
+    else
     {
-       fclose(configFile);
-       printf_s("Unable to find %s as a valid command", arg);
+        printf_s("Error with config File");
     }
 }
 
@@ -86,7 +108,9 @@ int main(int argc, char *argv[])
 {
     if (argc  > 1)
     {
-        SearchAndRun(argv[1], "./config.cfg");
+        numberOfCLArgs = argc;
+        //TODO: Look at not hard coding this so we can run it without rebuilding on other systems
+        SearchAndRun(argv, "C:/Users/Spector/Scripts/config.cfg");
     }
     else
     {
