@@ -4,7 +4,7 @@ SpechtCMDLauncher
 Due to multiple installs of windows and remaking batch files to launch applications.
 I am making this in hopes of making that easier for myself, and others that dislike doing such a thing.
 
-Once this is in a working state, you should be able to add the location of this to your windows %path.
+Once this is in a working state, you should be able to add the location of this to your windows %path%.
 Then run the program by typing 'launch'
 
 When making your config.cfg file make sure you don't have any uneeded spaces.
